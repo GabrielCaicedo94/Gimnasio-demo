@@ -1,0 +1,22 @@
+<% if (!lista.length) { %>
+  <div class="card-body text-muted text-center py-4">Nadie en esta lista.</div>
+<% } else { %>
+<div class="table-responsive"><table class="table table-hover mb-0"><tbody>
+  <% lista.forEach(f => { %>
+  <tr>
+    <td><a href="/clientes/<%= f.id %>" class="fw-semibold"><%= f.apellidos %> <%= f.nombres %></a>
+      <div class="text-muted fs-13"><%= f.plan %> · <%= f.dias === 0 ? 'hoy' : f.dias > 0 ? 'en ' + U.plural(f.dias) : 'hace ' + U.plural(-f.dias) %> (<%= U.verFecha(f.fecha_fin) %>)</div></td>
+    <td class="d-none d-md-table-cell"><%= f.telefono || '—' %></td>
+    <td class="text-end text-nowrap">
+      <% if (f.avisado) { %><span class="badge bg-info-subtle text-info me-1">Avisado <%= U.verFecha(f.avisado) %></span><% } %>
+      <% if (f.wa) { %>
+        <a href="<%= f.wa %>" target="_blank" rel="noopener" class="btn btn-sm btn-success"><i class="ti ti-brand-whatsapp"></i> WhatsApp</a>
+        <form action="/alertas/avisar" method="post" class="d-inline"><input type="hidden" name="_csrf" value="<%= csrf %>"><input type="hidden" name="membresia_id" value="<%= f.membresia_id %>">
+          <button class="btn btn-sm btn-outline-secondary" title="Marcar como avisado"><i class="ti ti-check"></i></button></form>
+      <% } else { %><span class="text-muted fs-13">Sin teléfono válido</span><% } %>
+      <a href="/clientes/<%= f.id %>#renovar" class="btn btn-sm btn-primary">Renovar</a>
+    </td>
+  </tr>
+  <% }) %>
+</tbody></table></div>
+<% } %>

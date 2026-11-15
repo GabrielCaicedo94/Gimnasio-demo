@@ -1,0 +1,47 @@
+<div class="card">
+  <div class="card-body">
+    <form method="get" action="/clientes" class="row g-2 align-items-center">
+      <div class="col-md-6">
+        <input id="buscar" type="search" name="q" value="<%= q %>" class="form-control form-control-lg" placeholder="Buscar por nombre, apellido o cédula…" autocomplete="off">
+      </div>
+      <div class="col-md-3">
+        <select name="estado" class="form-select form-select-lg" onchange="this.form.submit()">
+          <% [['', 'Todos los estados'], ['activo', 'Activos (membresía al día)'], ['por_vencer', 'Por vencer (próximos ' + diasAlerta + ' días)'], ['hoy', 'Vencen hoy'], ['vencido', 'Vencidos'], ['sin', 'Sin membresía / pase diario']].forEach(o => { %>
+            <option value="<%= o[0] %>" <%= filtro === o[0] ? 'selected' : '' %>><%= o[1] %></option>
+          <% }) %>
+        </select>
+      </div>
+      <div class="col-md-3 text-md-end"><a href="/clientes/nuevo" class="btn btn-primary btn-lg w-100"><i class="ti ti-user-plus me-1"></i> Nuevo cliente</a></div>
+    </form>
+  </div>
+  <div class="table-responsive">
+    <table class="table table-hover mb-0">
+      <thead class="table-light"><tr><th>Cliente</th><th class="d-none d-md-table-cell">Cédula</th><th class="d-none d-lg-table-cell">Teléfono</th><th>Plan</th><th>Vence</th><th>Estado</th></tr></thead>
+      <tbody>
+      <% if (!clientes.length) { %><tr><td colspan="6" class="text-center text-muted py-5">No se encontraron clientes.</td></tr><% } %>
+      <% clientes.forEach(c => { %>
+        <tr style="cursor:pointer" onclick="location.href='/clientes/<%= c.id %>'">
+          <td class="fw-semibold"><% if (c.tiene_foto) { %><img src="/fotos/<%= c.id %>?v=<%= encodeURIComponent(c.foto_v) %>" class="rounded-circle me-2" style="width:30px;height:30px;object-fit:cover" loading="lazy" alt=""><% } %><a href="/clientes/<%= c.id %>"><%= c.apellidos %> <%= c.nombres %></a></td>
+          <td class="d-none d-md-table-cell"><%= c.documento %></td>
+          <td class="d-none d-lg-table-cell"><%= c.telefono || '—' %></td>
+          <% const soloPase = !c.plan && c.ultimo_pase; %>
+          <td><%= c.plan || (soloPase ? 'Pase diario' : '—') %></td>
+          <td><%= soloPase ? 'Visita ' + U.verFecha(c.ultimo_pase) : U.verFecha(c.fecha_fin) %></td>
+          <td><% if (soloPase) { %><span class="badge bg-info-subtle text-info">Pase diario</span><% } else { %><span class="badge bg-<%= c.est.color %>-subtle text-<%= c.est.color %>"><%= c.est.texto %></span><% } %></td>
+        </tr>
+      <% }) %>
+      </tbody>
+    </table>
+  </div>
+  <div class="card-footer d-flex justify-content-between align-items-center">
+    <span class="text-muted fs-13"><%= total %> cliente(s)</span>
+    <% if (paginas > 1) { %>
+    <div class="btn-group">
+      <% const base = '/clientes?q=' + encodeURIComponent(q) + '&estado=' + filtro + '&p='; %>
+      <a class="btn btn-sm btn-outline-secondary <%= pagina <= 1 ? 'disabled' : '' %>" href="<%= base + (pagina - 1) %>">‹ Anterior</a>
+      <span class="btn btn-sm btn-light disabled">Pág. <%= pagina %> / <%= paginas %></span>
+      <a class="btn btn-sm btn-outline-secondary <%= pagina >= paginas ? 'disabled' : '' %>" href="<%= base + (pagina + 1) %>">Siguiente ›</a>
+    </div>
+    <% } %>
+  </div>
+</div>

@@ -1,0 +1,33 @@
+<div class="card">
+  <div class="card-body">
+    <form method="get" class="row g-2 align-items-end">
+      <div class="col-md-3"><label class="form-label">Mes</label><input type="month" name="mes" value="<%= mes %>" class="form-control" onchange="this.form.submit()"></div>
+      <div class="col-md-3"><label class="form-label">Método</label>
+        <select name="metodo" class="form-select" onchange="this.form.submit()">
+          <option value="">Todos</option>
+          <% ['efectivo', 'transferencia', 'datafast', 'otro'].forEach(m => { %><option value="<%= m %>" <%= metodo === m ? 'selected' : '' %>><%= m %></option><% }) %>
+        </select></div>
+      <div class="col-md-3"><div class="form-check mb-2"><input class="form-check-input" type="checkbox" name="sin" value="1" id="sin" <%= sinComp ? 'checked' : '' %> onchange="this.form.submit()"><label class="form-check-label" for="sin">Solo sin comprobante</label></div></div>
+      <% if (total !== null) { %><div class="col-md-3 text-md-end"><div class="text-muted fs-13">Total del filtro (sin anulados)</div><div class="fs-20 fw-semibold"><%= U.dinero(total) %></div></div><% } %>
+    </form>
+  </div>
+  <div class="table-responsive">
+    <table class="table table-hover mb-0">
+      <thead class="table-light"><tr><th>Fecha</th><th>Cliente</th><th>Plan</th><th>Monto</th><th>Método</th><th>Comprobante</th><th></th></tr></thead>
+      <tbody>
+        <% if (!pagos.length) { %><tr><td colspan="7" class="text-center text-muted py-5">No hay pagos con este filtro.</td></tr><% } %>
+        <% pagos.forEach(p => { %>
+          <tr class="<%= p.estado === 'anulado' ? 'text-muted' : '' %>">
+            <td><%= U.verFecha(p.fecha_pago) %><% if (p.estado === 'anulado') { %><div><span class="badge bg-danger">ANULADO</span></div><% } %></td>
+            <td><a class="fw-semibold" href="/clientes/<%= p.cliente_id %>"><%= p.apellidos %> <%= p.nombres %></a><div class="text-muted fs-12"><%= p.documento %></div></td>
+            <td><%= p.plan %><div class="text-muted fs-12">hasta <%= U.verFecha(p.fecha_fin) %></div></td>
+            <td class="fw-semibold <%= p.estado === 'anulado' ? 'text-decoration-line-through' : '' %>"><%= U.dinero(p.monto_centavos) %></td>
+            <td><%= p.metodo %><% if (p.referencia) { %><div class="text-muted fs-12">Ref. <%= p.referencia %></div><% } %></td>
+            <td><%- include('partials/comp-celda', { p }) %></td>
+            <td><a class="btn btn-sm btn-soft-secondary" href="/pagos/<%= p.id %>">Ver</a></td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+</div>

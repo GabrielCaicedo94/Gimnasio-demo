@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="es" data-bs-theme="light">
+<head>
+    <meta charset="utf-8" />
+    <title><%= title ? title + ' | ' : '' %><%= cfg.nombre_gimnasio %></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32.png">
+    <link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+    <meta name="theme-color" content="#000000">
+    <script>/* Aplica el tema guardado ANTES de pintar la página (evita el parpadeo) */
+    (function(){try{var t=localStorage.getItem('gym-tema');if(t!=='dark'&&t!=='light')t='light';document.documentElement.setAttribute('data-bs-theme',t);}catch(e){}})();</script>
+    <link href="/vendor/bootstrap/bootstrap.min.css" rel="stylesheet" />
+    <link href="/vendor/tabler-icons/tabler-icons.min.css" rel="stylesheet" />
+    <link href="/gym.css" rel="stylesheet" />
+</head>
+<body>
+<div class="wrapper">
+
+    <!-- Menú lateral -->
+    <div class="sidenav-backdrop"></div>
+    <div class="sidenav-menu">
+        <a href="/" class="logo">
+            <img class="logo-claro" src="/images/logo-dark.png" alt="logo">
+            <img class="logo-oscuro" src="/images/logo.png" alt="logo">
+        </a>
+        <button class="sidenav-close d-lg-none" type="button" aria-label="Cerrar menú"><i class="ti ti-x"></i></button>
+
+        <div class="sidenav-scroll">
+            <ul class="side-nav">
+                <li class="side-nav-title"><%= cfg.nombre_gimnasio %></li>
+                <% const nav = [
+                    ['inicio', '/', 'ti-dashboard', 'Inicio'],
+                    ['clientes', '/clientes', 'ti-users', 'Clientes'],
+                    ['pagos', '/pagos', 'ti-receipt', 'Pagos'],
+                    ['alertas', '/alertas', 'ti-bell-ringing', 'Alertas'],
+                ]; %>
+                <% nav.forEach(n => { %>
+                <li class="side-nav-item">
+                    <a href="<%= n[1] %>" class="side-nav-link <%= active === n[0] ? 'active' : '' %>">
+                        <span class="menu-icon"><i class="ti <%= n[2] %>"></i></span>
+                        <span class="menu-text"> <%= n[3] %> </span>
+                        <% if (n[0] === 'alertas' && badgeAlertas > 0) { %><span class="badge bg-danger rounded-pill"><%= badgeAlertas %></span><% } %>
+                    </a>
+                </li>
+                <% }) %>
+                <% if (esAdmin) { %>
+                <li class="side-nav-title">Administración</li>
+                <% [['usuarios', '/usuarios', 'ti-user-shield', 'Usuarios'], ['bitacora', '/bitacora', 'ti-history', 'Bitácora'],
+                    ['planes', '/planes', 'ti-tags', 'Planes'], ['config', '/configuracion', 'ti-settings', 'Configuración']].forEach(n => { %>
+                <li class="side-nav-item">
+                    <a href="<%= n[1] %>" class="side-nav-link <%= active === n[0] ? 'active' : '' %>">
+                        <span class="menu-icon"><i class="ti <%= n[2] %>"></i></span><span class="menu-text"> <%= n[3] %> </span></a>
+                </li>
+                <% }) %>
+                <% } %>
+            </ul>
+            <div class="clearfix"></div>
+        </div>
+    </div>
+
+    <!-- Barra superior -->
+    <header class="app-topbar" id="header">
+        <div class="topbar-menu">
+            <div class="d-flex align-items-center gap-2">
+                <button class="topbar-link sidenav-toggle-button" type="button" aria-label="Mostrar u ocultar el menú"><i class="ti ti-menu-2 fs-24"></i></button>
+                <h4 class="page-title fs-20 fw-semibold mb-0"><%= title || 'Inicio' %></h4>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+                <form action="/clientes" method="get" class="d-none d-md-flex">
+                    <input type="search" name="q" class="form-control" style="width:260px" placeholder="Buscar cliente: nombre o cédula…">
+                </form>
+                <div>
+                    <button class="topbar-link" id="tema-toggle" type="button" title="Cambiar tema claro / oscuro" aria-label="Cambiar tema claro u oscuro">
+                        <i class="ti ti-moon fs-22 icon-moon"></i><i class="ti ti-sun fs-22 icon-sun"></i>
+                    </button>
+                </div>
+                <div>
+                    <div class="dropdown">
+                        <button class="topbar-link dropdown-toggle drop-arrow-none" data-bs-toggle="dropdown" data-bs-offset="0,12" type="button">
+                            <i class="ti ti-user-circle fs-22 me-1"></i><span class="d-none d-sm-inline"><%= user.nombre %> <small class="text-muted">· <%= esAdmin ? 'Administrador' : 'Recepción' %></small></span>
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-end">
+                            <a class="dropdown-item" href="/cuenta"><i class="ti ti-key me-1"></i> Mi cuenta</a>
+                            <form action="/logout" method="post" class="m-0">
+                                <input type="hidden" name="_csrf" value="<%= csrf %>">
+                                <button class="dropdown-item" type="submit"><i class="ti ti-logout me-1"></i> Cerrar sesión</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="page-content">
+        <div class="page-container">
+            <% if (flash) { %>
+            <div class="alert alert-<%= flash.tipo === 'ok' ? 'success' : 'danger' %> alert-dismissible fade show" role="alert">
+                <%= flash.texto %>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            <% } %>
+            <%- body %>
+        </div>
+    </div>
+</div>
+<script src="/vendor/bootstrap/bootstrap.bundle.min.js"></script>
+<script src="/gym.js"></script>
+</body>
+</html>

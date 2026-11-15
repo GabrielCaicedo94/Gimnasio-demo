@@ -1,0 +1,64 @@
+<%
+const tarjetas = [
+  ['Clientes activos', stats.activos, 'ti-circle-check', 'success', '/clientes?estado=activo'],
+  ['Vencen hoy', stats.hoy, 'ti-alarm', 'warning', '/clientes?estado=hoy'],
+  ['Vencen en los próximos ' + diasAlerta + ' días', stats.porVencer, 'ti-hourglass', 'warning', '/clientes?estado=por_vencer'],
+  ['Membresías vencidas', stats.vencidos, 'ti-circle-x', 'danger', '/clientes?estado=vencido'],
+  ['Clientes registrados', stats.total, 'ti-users', 'primary', '/clientes'],
+  esAdmin ? ['Ingresos del mes', U.dinero(stats.ingresosMes), 'ti-cash', 'success', '/pagos']
+          : ['Pases diarios hoy', stats.pasesHoy, 'ti-ticket', 'info', '/clientes?estado=sin'],
+];
+%>
+<div class="row g-3 mb-3">
+  <% tarjetas.forEach(t => { %>
+  <div class="col-6 col-lg-4 col-xxl-2 d-flex">
+    <a href="<%= t[4] %>" class="card stat-card h-100 mb-0 text-decoration-none">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center h-100 gap-2">
+          <div class="min-w-0">
+            <p class="text-muted mb-1 fs-13 stat-label"><%= t[0] %></p>
+            <div class="fs-28 fw-semibold text-body text-nowrap"><%= t[1] %></div>
+          </div>
+          <span class="avatar-sm rounded bg-<%= t[3] %>-subtle text-<%= t[3] %> d-flex align-items-center justify-content-center fs-22 flex-shrink-0" style="width:44px;height:44px"><i class="ti <%= t[2] %>"></i></span>
+        </div>
+      </div>
+    </a>
+  </div>
+  <% }) %>
+</div>
+
+<% if (stats.sinComprobante > 0) { %>
+<div class="alert alert-warning d-flex justify-content-between align-items-center">
+  <span><i class="ti ti-alert-triangle me-1"></i> <%= stats.sinComprobante %> pago(s) de este mes no tienen comprobante adjunto.</span>
+  <a class="btn btn-sm btn-warning" href="/pagos?sin=1">Revisar</a>
+</div>
+<% } %>
+
+<div class="row g-3">
+  <div class="col-xl-6">
+    <div class="card"><div class="card-header d-flex justify-content-between align-items-center">
+      <h5 class="card-title mb-0">Por vencer (hoy y próximos <%= diasAlerta %> días)</h5>
+      <a href="/alertas" class="btn btn-sm btn-soft-primary">Ver alertas</a></div>
+      <div class="table-responsive"><table class="table table-hover mb-0">
+        <tbody>
+        <% if (!proximos.length) { %><tr><td class="text-muted text-center py-4">Nadie vence en este rango.</td></tr><% } %>
+        <% proximos.forEach(f => { const e = U.estado(f.fecha_fin, hoy, diasAlerta); %>
+          <tr><td><a href="/clientes/<%= f.id %>" class="fw-semibold"><%= f.apellidos %> <%= f.nombres %></a><div class="text-muted fs-13"><%= f.plan %></div></td>
+              <td class="text-end"><span class="badge bg-<%= e.color %>-subtle text-<%= e.color %>"><%= e.texto %></span><div class="text-muted fs-13"><%= U.verFecha(f.fecha_fin) %></div></td></tr>
+        <% }) %>
+        </tbody></table></div></div>
+  </div>
+  <div class="col-xl-6">
+    <div class="card"><div class="card-header d-flex justify-content-between align-items-center">
+      <h5 class="card-title mb-0">Últimos pagos</h5><a href="/pagos" class="btn btn-sm btn-soft-primary">Ver todos</a></div>
+      <div class="table-responsive"><table class="table table-hover mb-0"><tbody>
+        <% if (!ultimosPagos.length) { %><tr><td class="text-muted text-center py-4">Aún no hay pagos registrados.</td></tr><% } %>
+        <% ultimosPagos.forEach(p => { %>
+          <tr><td><a href="/clientes/<%= p.cliente_id %>" class="fw-semibold"><%= p.apellidos %> <%= p.nombres %></a><div class="text-muted fs-13"><%= U.verFecha(p.fecha_pago) %> · <%= p.metodo %></div></td>
+              <td class="text-end fw-semibold"><%= U.dinero(p.monto_centavos) %>
+                <% if (p.metodo !== 'efectivo') { %><div><% if (p.n_comp) { %><span class="badge bg-success-subtle text-success">Con comprobante</span><% } else { %><span class="badge bg-danger-subtle text-danger">Sin comprobante</span><% } %></div><% } %></td></tr>
+        <% }) %>
+      </tbody></table></div></div>
+  </div>
+</div>
+<p class="text-muted fs-13 mt-2">Nuevos este mes: <b><%= stats.nuevosMes %></b> · Sin membresía (solo pase diario o sin pagos): <b><%= stats.sin %></b> · Pases diarios hoy: <b><%= stats.pasesHoy %></b></p>

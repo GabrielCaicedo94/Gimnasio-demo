@@ -1,0 +1,24 @@
+{
+  "name": "gym-manager",
+  "version": "1.0.0",
+  "description": "Sistema web de gestión de membresías, pagos y clientes para gimnasios (local, SQLite)",
+  "main": "app.js",
+  "scripts": {
+    "start": "node --no-warnings app.js",
+    "dev": "node --no-warnings --watch app.js",
+    "crear-admin": "node --no-warnings scripts/crear-admin.js",
+    "reset-clave": "node --no-warnings scripts/reset-clave.js",
+    "demo": "node --no-warnings scripts/demo-datos.js"
+  },
+  "engines": {
+    "node": ">=22.16"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "ejs": "^3.1.10",
+    "express": "^4.21.0",
+    "express-ejs-layouts": "^2.5.1",
+    "express-session": "^1.18.1",
+    "multer": "^2.0.2"
+  }
+}

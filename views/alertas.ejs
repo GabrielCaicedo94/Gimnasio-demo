@@ -1,0 +1,13 @@
+<div class="card border-warning">
+  <div class="card-header bg-warning-subtle"><h5 class="card-title mb-0"><i class="ti ti-alarm me-1"></i> Vencen hoy (<%= hoyLista.length %>)</h5></div>
+  <%- include('partials/alerta-tabla', { lista: hoyLista }) %>
+</div>
+<div class="card">
+  <div class="card-header"><h5 class="card-title mb-0"><i class="ti ti-hourglass me-1"></i> Próximos <%= diasAlerta %> días (<%= proximos.length %>)</h5></div>
+  <%- include('partials/alerta-tabla', { lista: proximos }) %>
+</div>
+<div class="card">
+  <div class="card-header"><h5 class="card-title mb-0"><i class="ti ti-circle-x me-1"></i> Vencidos en los últimos 30 días (<%= vencidos.length %>)</h5></div>
+  <%- include('partials/alerta-tabla', { lista: vencidos }) %>
+</div>
+<p class="text-muted fs-13">El botón WhatsApp abre el chat con el mensaje listo; tú lo envías. Después marca ✓ para saber a quién ya avisaste. Los días de anticipación se cambian en Configuración.</p>

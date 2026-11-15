@@ -1,0 +1,22 @@
+<% if (p.comprobantes.length) { %>
+  <div class="d-flex gap-1 flex-wrap">
+  <% p.comprobantes.forEach(function (x) { %>
+    <% if (x.mime.indexOf('image/') === 0) { %>
+      <a href="/comprobantes/<%= x.id %>" target="_blank" title="Ver comprobante"><img class="thumb" src="/comprobantes/<%= x.id %>" alt="comprobante" loading="lazy"></a>
+    <% } else { %>
+      <a href="/comprobantes/<%= x.id %>" target="_blank" class="btn btn-sm btn-outline-secondary"><i class="ti ti-file-type-pdf"></i> PDF</a>
+    <% } %>
+  <% }) %>
+  </div>
+<% } else if (p.estado === 'anulado') { %>
+  <span class="text-muted fs-13">—</span>
+<% } else if (p.metodo === 'efectivo') { %>
+  <span class="text-muted fs-13">Efectivo</span>
+<% } else { %>
+  <form action="/pagos/<%= p.id %>/comprobante?_csrf=<%= csrf %>" method="post" enctype="multipart/form-data" class="m-0">
+    <span class="badge bg-danger-subtle text-danger me-1">Falta</span>
+    <label class="btn btn-sm btn-outline-primary mb-0"><i class="ti ti-paperclip"></i> Adjuntar
+      <input type="file" name="archivo" accept="image/*,application/pdf" data-reducir="1600" data-enviar hidden>
+    </label>
+  </form>
+<% } %>

@@ -1,0 +1,28 @@
+<div class="row g-3">
+  <div class="col-lg-6">
+    <div class="card"><div class="card-header"><h5 class="card-title mb-0">General</h5></div><div class="card-body">
+      <form action="/configuracion?_csrf=<%= csrf %>" method="post">
+        <div class="mb-3"><label class="form-label">Nombre del gimnasio</label><input name="nombre_gimnasio" class="form-control" value="<%= cfg.nombre_gimnasio %>" required></div>
+        <div class="mb-3"><label class="form-label">Días de anticipación para alertas</label>
+          <input name="dias_alerta" type="number" min="1" max="15" class="form-control" value="<%= cfg.dias_alerta %>" style="width:120px"></div>
+        <button class="btn btn-primary">Guardar</button>
+      </form></div></div>
+  </div>
+
+  <div class="col-lg-6">
+    <div class="card"><div class="card-header"><h5 class="card-title mb-0"><i class="ti ti-device-mobile me-1"></i> Usar desde el celular</h5></div><div class="card-body">
+      <p class="mb-2">Con el celular conectado a la <b>misma WiFi</b> de esta laptop, abre en su navegador:</p>
+      <% if (redes.length) { %><% redes.forEach(r => { %><div class="fs-18 fw-semibold mb-1"><%= r %></div><% }) %>
+      <% } else { %><div class="text-muted">No se detectó una red WiFi/Ethernet activa.</div><% } %>
+      <p class="text-muted fs-13 mt-2 mb-0">Si no abre, Windows puede estar bloqueando la conexión: al iniciar el sistema por primera vez, acepta el aviso del Firewall para redes privadas. Esta laptop debe estar encendida con el sistema abierto.</p>
+    </div></div>
+
+    <div class="card"><div class="card-header d-flex justify-content-between align-items-center"><h5 class="card-title mb-0"><i class="ti ti-database-export me-1"></i> Respaldos</h5>
+      <form action="/respaldos?_csrf=<%= csrf %>" method="post" class="m-0"><button class="btn btn-sm btn-primary">Respaldar ahora</button></form></div>
+      <div class="card-body">
+        <p class="text-muted fs-13">Se crea uno automático cada día (se conservan 30). <b>Copia periódicamente</b> las carpetas <code>data/respaldos</code> y <code>data/comprobantes</code> a una memoria USB o a la nube.</p>
+        <ul class="list-unstyled mb-0 fs-14">
+          <% respaldos.slice(0, 8).forEach(r => { %><li class="d-flex justify-content-between border-bottom py-1"><a href="/respaldos/<%= r.nombre %>"><%= r.nombre %></a><span class="text-muted"><%= r.kb %> KB</span></li><% }) %>
+        </ul></div></div>
+  </div>
+</div>

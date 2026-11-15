@@ -1,0 +1,40 @@
+<div class="card">
+  <div class="card-body">
+    <form method="get" class="row g-2">
+      <div class="col-md-5"><input name="q" value="<%= q %>" class="form-control" placeholder="Buscar por usuario, acción o texto…"></div>
+      <div class="col-md-3"><select name="entidad" class="form-select" onchange="this.form.submit()">
+        <% [['', 'Todo'], ['pago', 'Pagos'], ['cliente', 'Clientes'], ['usuario', 'Usuarios'], ['plan', 'Planes'], ['config', 'Configuración']].forEach(o => { %>
+          <option value="<%= o[0] %>" <%= entidad === o[0] ? 'selected' : '' %>><%= o[1] %></option><% }) %></select></div>
+      <div class="col-md-2"><button class="btn btn-primary w-100">Buscar</button></div>
+    </form>
+  </div>
+  <div class="table-responsive"><table class="table table-hover mb-0 align-top">
+    <thead class="table-light"><tr><th style="width:150px">Fecha</th><th>Usuario</th><th>Acción</th><th>Detalle</th></tr></thead>
+    <tbody>
+      <% if (!filas.length) { %><tr><td colspan="4" class="text-center text-muted py-5">Sin registros.</td></tr><% } %>
+      <% filas.forEach(f => { %>
+        <tr>
+          <td class="fs-13"><%= U.verFecha(f.fecha_hora.slice(0, 10)) %> <span class="text-muted"><%= f.fecha_hora.slice(11, 16) %></span></td>
+          <td><%= f.usuario %></td>
+          <td><span class="badge bg-<%= ['anular','eliminar','desactivar'].includes(f.accion) ? 'danger' : f.accion === 'corregir' ? 'warning' : 'secondary' %>-subtle text-<%= ['anular','eliminar','desactivar'].includes(f.accion) ? 'danger' : f.accion === 'corregir' ? 'warning' : 'secondary' %>"><%= f.accion %></span>
+            <div class="text-muted fs-12"><%= f.entidad %><% if (f.entidad === 'pago' && f.entidad_id) { %> · <a href="/pagos/<%= f.entidad_id %>">#<%= f.entidad_id %></a><% } else if (f.entidad === 'cliente' && f.entidad_id) { %> · <a href="/clientes/<%= f.entidad_id %>">#<%= f.entidad_id %></a><% } %></div></td>
+          <td><%= f.resumen %>
+            <% if (f.detalle && f.detalle.despues) { %><% Object.keys(f.detalle.despues).forEach(k => { %>
+              <div class="fs-13 text-muted"><b><%= k %>:</b> <s><%= f.detalle.antes[k] %></s> → <%= f.detalle.despues[k] %></div><% }) %>
+            <% } else if (f.detalle && f.detalle.antes) { %><% Object.keys(f.detalle.antes).forEach(k => { %>
+              <div class="fs-13 text-muted"><b><%= k %>:</b> <%= f.detalle.antes[k] %></div><% }) %><% } %>
+            <% if (f.detalle && f.detalle.motivo) { %><div class="fs-13"><b>Motivo:</b> <%= f.detalle.motivo %></div><% } %>
+          </td>
+        </tr>
+      <% }) %>
+    </tbody></table></div>
+  <div class="card-footer d-flex justify-content-between align-items-center">
+    <span class="text-muted fs-13"><%= total %> registro(s)</span>
+    <% if (paginas > 1) { const base = '/bitacora?q=' + encodeURIComponent(q) + '&entidad=' + entidad + '&p='; %>
+    <div class="btn-group">
+      <a class="btn btn-sm btn-outline-secondary <%= pagina <= 1 ? 'disabled' : '' %>" href="<%= base + (pagina - 1) %>">‹ Anterior</a>
+      <span class="btn btn-sm btn-light disabled">Pág. <%= pagina %> / <%= paginas %></span>
+      <a class="btn btn-sm btn-outline-secondary <%= pagina >= paginas ? 'disabled' : '' %>" href="<%= base + (pagina + 1) %>">Siguiente ›</a>
+    </div><% } %>
+  </div>
+</div>

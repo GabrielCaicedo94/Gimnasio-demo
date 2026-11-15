@@ -1,0 +1,76 @@
+<% const anul = p.estado === 'anulado'; %>
+<div class="row g-3">
+  <div class="col-lg-6">
+    <div class="card"><div class="card-body">
+      <div class="d-flex justify-content-between align-items-start mb-2">
+        <div><h4 class="mb-1">Pago #<%= p.id %> <% if (anul) { %><span class="badge bg-danger ms-1">ANULADO</span><% } %></h4>
+          <a href="/clientes/<%= p.cliente_id %>" class="fw-semibold"><%= p.apellidos %> <%= p.nombres %></a> <span class="text-muted">· <%= p.documento %></span></div>
+        <a href="/pagos" class="btn btn-sm btn-light">Volver</a>
+      </div>
+      <% if (anul) { %>
+      <div class="alert alert-danger">
+        <b>Anulado</b> por <%= p.anulado_por_nombre || 'soporte técnico' %> el <%= U.verFecha((p.anulado_en || '').slice(0, 10)) %> <%= (p.anulado_en || '').slice(11, 16) %>.<br>
+        <b>Motivo:</b> <%= p.motivo_anulacion %><br>
+        <span class="fs-13">No cuenta en ingresos ni en la membresía del cliente. El registro y su comprobante se conservan.</span>
+      </div>
+      <% } %>
+      <dl class="row mb-0 fs-14 <%= anul ? 'text-muted' : '' %>">
+        <dt class="col-5 fw-normal text-muted">Plan</dt><dd class="col-7"><%= p.plan %></dd>
+        <dt class="col-5 fw-normal text-muted">Periodo</dt><dd class="col-7"><%= U.verFecha(p.fecha_inicio) %> → <%= U.verFecha(p.fecha_fin) %></dd>
+        <dt class="col-5 fw-normal text-muted">Monto</dt><dd class="col-7 fw-semibold <%= anul ? 'text-decoration-line-through' : '' %>"><%= U.dinero(p.monto_centavos) %></dd>
+        <dt class="col-5 fw-normal text-muted">Método</dt><dd class="col-7"><%= p.metodo %></dd>
+        <dt class="col-5 fw-normal text-muted">Referencia</dt><dd class="col-7"><%= p.referencia || '—' %></dd>
+        <dt class="col-5 fw-normal text-muted">Fecha de pago</dt><dd class="col-7"><%= U.verFecha(p.fecha_pago) %></dd>
+        <dt class="col-5 fw-normal text-muted">Registrado por</dt><dd class="col-7"><%= p.registrado_por || '—' %></dd>
+        <dt class="col-5 fw-normal text-muted">Notas</dt><dd class="col-7"><%= p.notas || '—' %></dd>
+        <dt class="col-5 fw-normal text-muted">Comprobante</dt><dd class="col-7"><%- include('partials/comp-celda', { p }) %></dd>
+      </dl>
+    </div></div>
+
+    <div class="card"><div class="card-header"><h5 class="card-title mb-0">Historial de cambios</h5></div>
+      <div class="card-body">
+        <% if (!historial.length) { %><p class="text-muted mb-0">Sin correcciones ni anulaciones.</p><% } %>
+        <% historial.forEach(h => { %>
+          <div class="border-bottom pb-2 mb-2">
+            <b><%= h.accion %></b> · <%= h.usuario %> · <span class="text-muted"><%= U.verFecha(h.fecha_hora.slice(0, 10)) %> <%= h.fecha_hora.slice(11, 16) %></span>
+            <% if (h.detalle && h.detalle.despues) { Object.keys(h.detalle.despues).forEach(k => { %>
+              <div class="fs-13 text-muted"><%= k %>: <s><%= h.detalle.antes[k] %></s> → <%= h.detalle.despues[k] %></div><% }) } %>
+            <% if (h.detalle && h.detalle.motivo) { %><div class="fs-13">Motivo: <%= h.detalle.motivo %></div><% } %>
+          </div>
+        <% }) %>
+      </div></div>
+  </div>
+
+  <% if (esAdmin && !anul) { %>
+  <div class="col-lg-6">
+    <div class="card border-warning"><div class="card-header"><h5 class="card-title mb-0"><i class="ti ti-edit me-1"></i> Corregir pago</h5></div>
+      <div class="card-body">
+        <form action="/pagos/<%= p.id %>/corregir" method="post" data-confirmar="¿Guardar la corrección? El vencimiento se recalcula." data-tipo="aviso" data-boton="Guardar corrección">
+          <input type="hidden" name="_csrf" value="<%= csrf %>">
+          <div class="row g-2">
+            <div class="col-md-6"><label class="form-label">Plan</label><select name="plan_id" class="form-select">
+              <% planes.forEach(pl => { %><option value="<%= pl.id %>" <%= pl.id === p.plan_id ? 'selected' : '' %>><%= pl.nombre %> (<%= U.plural(pl.duracion_dias) %>)</option><% }) %></select></div>
+            <div class="col-md-6"><label class="form-label">Inicio de membresía</label><input type="date" name="fecha_inicio" class="form-control" value="<%= p.fecha_inicio %>" required></div>
+            <div class="col-md-6"><label class="form-label">Monto ($)</label><input name="monto" class="form-control" inputmode="decimal" value="<%= U.dineroInput(p.monto_centavos) %>" required></div>
+            <div class="col-md-6"><label class="form-label">Fecha de pago</label><input type="date" name="fecha_pago" class="form-control" value="<%= p.fecha_pago %>" max="<%= U.hoy() %>" required></div>
+            <div class="col-md-6"><label class="form-label">Método</label><select name="metodo" class="form-select">
+              <% ['efectivo', 'transferencia', 'datafast', 'otro'].forEach(m => { %><option <%= p.metodo === m ? 'selected' : '' %>><%= m %></option><% }) %></select></div>
+            <div class="col-md-6"><label class="form-label">Referencia</label><input name="referencia" class="form-control" maxlength="60" value="<%= p.referencia || '' %>"></div>
+            <div class="col-12"><label class="form-label">Motivo de la corrección *</label><input name="motivo" class="form-control" minlength="5" maxlength="300" required placeholder="Ej. se digitó mal la fecha de inicio"></div>
+          </div>
+          <button class="btn btn-warning mt-3">Guardar corrección</button>
+        </form>
+      </div></div>
+
+    <div class="card border-danger"><div class="card-header"><h5 class="card-title mb-0 text-danger"><i class="ti ti-ban me-1"></i> Anular pago</h5></div>
+      <div class="card-body">
+        <p class="text-muted fs-13">El pago no se borra: queda como ANULADO con tu nombre y motivo. Deja de contar en ingresos y el cliente vuelve a su membresía anterior.</p>
+        <form action="/pagos/<%= p.id %>/anular" method="post" data-confirmar="¿Anular este pago? No se puede deshacer." data-tipo="peligro" data-boton="Anular pago">
+          <input type="hidden" name="_csrf" value="<%= csrf %>">
+          <input name="motivo" class="form-control mb-2" minlength="5" maxlength="300" required placeholder="Motivo de la anulación *">
+          <button class="btn btn-danger">Anular pago</button>
+        </form>
+      </div></div>
+  </div>
+  <% } %>
+</div>

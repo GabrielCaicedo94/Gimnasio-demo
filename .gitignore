@@ -1,0 +1,19 @@
+# Dependencias
+node_modules/
+
+# Datos del sistema (base de datos, fotos, comprobantes, respaldos, clave de sesión, logs)
+data/
+*.log
+
+# Sistema / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.env
+
+# Por seguridad (aunque ya estén dentro de data/)
+*.db
+*.db-shm
+*.db-wal
+*.key
+.env.*

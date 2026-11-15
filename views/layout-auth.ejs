@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="es" data-bs-theme="light">
+<head>
+    <meta charset="utf-8" />
+    <title><%= cfg.nombre_gimnasio %></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32.png">
+    <link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+    <meta name="theme-color" content="#000000">
+    <script>/* Aplica el tema guardado ANTES de pintar la página (evita el parpadeo) */
+    (function(){try{var t=localStorage.getItem('gym-tema');if(t!=='dark'&&t!=='light')t='light';document.documentElement.setAttribute('data-bs-theme',t);}catch(e){}})();</script>
+    <link href="/vendor/bootstrap/bootstrap.min.css" rel="stylesheet" />
+    <link href="/vendor/tabler-icons/tabler-icons.min.css" rel="stylesheet" />
+    <link href="/gym.css" rel="stylesheet" />
+</head>
+<body>
+<%- body %>
+</body>
+</html>

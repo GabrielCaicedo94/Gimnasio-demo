@@ -1,0 +1,33 @@
+<div class="row g-3">
+  <div class="col-lg-8">
+    <div class="card"><div class="table-responsive"><table class="table mb-0">
+      <thead class="table-light"><tr><th>Plan</th><th>Duración (días)</th><th>Precio ($)</th><th>Estado</th><th></th></tr></thead>
+      <tbody>
+      <% planes.forEach(p => { %>
+        <tr class="<%= p.activo ? '' : 'text-muted' %>">
+          <form action="/planes?_csrf=<%= csrf %>" method="post" id="f<%= p.id %>"><input type="hidden" name="id" value="<%= p.id %>"></form>
+          <td><input form="f<%= p.id %>" name="nombre" class="form-control form-control-sm" value="<%= p.nombre %>"></td>
+          <td><input form="f<%= p.id %>" name="duracion_dias" class="form-control form-control-sm" value="<%= p.duracion_dias %>" style="width:90px"></td>
+          <td><input form="f<%= p.id %>" name="precio" class="form-control form-control-sm" value="<%= U.dineroInput(p.precio_centavos) %>" style="width:100px"></td>
+          <td><span class="badge bg-<%= p.activo ? 'success' : 'secondary' %>-subtle text-<%= p.activo ? 'success' : 'secondary' %>"><%= p.activo ? 'Activo' : 'Oculto' %></span></td>
+          <td class="text-end text-nowrap">
+            <button form="f<%= p.id %>" class="btn btn-sm btn-primary">Guardar</button>
+            <form action="/planes/<%= p.id %>/activo?_csrf=<%= csrf %>" method="post" class="d-inline"><button class="btn btn-sm btn-outline-secondary"><%= p.activo ? 'Ocultar' : 'Activar' %></button></form>
+          </td>
+        </tr>
+      <% }) %>
+      </tbody></table></div></div>
+  </div>
+  <div class="col-lg-4">
+    <div class="card"><div class="card-header"><h5 class="card-title mb-0">Nuevo plan</h5></div><div class="card-body">
+      <form action="/planes?_csrf=<%= csrf %>" method="post">
+        <div class="mb-2"><label class="form-label">Nombre</label><input name="nombre" class="form-control" required></div>
+        <div class="mb-2"><label class="form-label">Duración (días)</label><input name="duracion_dias" class="form-control" inputmode="numeric" required></div>
+        <div class="mb-3"><label class="form-label">Precio ($)</label><input name="precio" class="form-control" inputmode="decimal" required></div>
+        <button class="btn btn-primary">Crear plan</button>
+      </form>
+      <p class="text-muted fs-13 mt-3">Un plan de <b>1 día</b> funciona como <b>pase diario</b>: no cuenta como membresía, el cliente queda "sin membresía" y no genera alertas de vencimiento.</p>
+      <p class="text-muted fs-13 mb-0">Cambiar un precio no altera los pagos ya registrados. Los planes no se borran: se ocultan.</p>
+    </div></div>
+  </div>
+</div>

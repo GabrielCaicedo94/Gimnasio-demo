@@ -100,4 +100,4 @@ data/             (no se sube a Git) base de datos, fotos, comprobantes, respald
 
 ## Licencias y créditos
 
-El código del proyecto es propio. Las bibliotecas de terceros que se incluyen en `public/vendor` son de código abierto (licencia MIT): [Bootstrap](https://getbootstrap.com) y [Tabler Icons](https://tabler.io/icons). Las tipografías Public Sans y Outfit usan la licencia SIL Open Font License. No se incluye ninguna plantilla comercial.
+El código del proyecto es propio y se publica bajo la [licencia MIT](LICENSE). Las bibliotecas de terceros que se incluyen en `public/vendor` son de código abierto (licencia MIT): [Bootstrap](https://getbootstrap.com) y [Tabler Icons](https://tabler.io/icons). Las tipografías Public Sans y Outfit usan la licencia SIL Open Font License. No se incluye ninguna plantilla comercial.

@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Sistema web de gestión de membresías, pagos y clientes para gimnasios (local, SQLite)",
   "main": "app.js",
+  "license": "MIT",
   "scripts": {
     "start": "node --no-warnings app.js",
     "dev": "node --no-warnings --watch app.js",
